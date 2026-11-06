@@ -1,53 +1,55 @@
 # Sonora
 
-**Local-first music player.** Nhập nhạc từ file, folder hoặc link (SoundCloud, Spotify, YouTube, Bandcamp…), **giữ nguyên chất lượng nguồn** và quản lý toàn bộ thư viện ngay trên máy bạn.
+**A local-first music player.** Import music from files, folders or links (SoundCloud, Spotify, YouTube, Bandcamp…), **keep the source quality**, and manage your whole library on your own device.
 
-> Sonora không phải dịch vụ online: không tài khoản, không server, nhạc nằm trong thư mục bạn chọn.
+> Sonora is not an online service: no account, no server. Your music lives in a folder you choose.
 
-## Tính năng
+**Website:** https://levidang306.github.io/sonora/
 
-- **Import preview** — dán link, xem danh sách bài, **nghe thử đúng luồng sẽ tải về**, chọn bài trước khi tải
-- **Chất lượng minh bạch** — mỗi bài có badge chất lượng *thực tế* của nguồn
-  - 🟢 lossless / file gốc (`FLAC 24-bit`, `WAV Original`)
-  - 🟡 nén nhưng tốt (`AAC 160k`, `Opus 129k`, `MP3 320k`)
-  - 🔴 thấp / không rõ
-- **Không tự convert** — mặc định *Original* giữ nguyên luồng tốt nhất nguồn cung cấp. Nếu bạn chọn FLAC/WAV từ nguồn nén, app cảnh báo rằng nó **không làm hay hơn**, và badge vẫn ghi `from AAC 160k`
-- Ưu tiên file gốc khi nghệ sĩ bật nút tải trên SoundCloud
-- Spotify: lấy metadata + ảnh bìa từ Spotify, tìm bản khớp trên YouTube Music, cảnh báo khi độ dài lệch (có thể là bản khác)
-- Thư viện local (SQLite): All music, Favorites, Recently added, Playlists, Local folders, tìm kiếm, lọc theo chất lượng
-- Player: queue, shuffle, repeat, phím tắt, phím media của hệ điều hành
-- Kéo thả file/folder — copy nguyên bản, không convert
-- Huỷ được khi đang tải; không bao giờ ghi đè file có sẵn
-- Cập nhật *download engine* (yt-dlp) ngay trong app, không cần cài lại
+## Features
 
-## Tải về
+- **Import preview**: paste a link, see the track list, **listen to the exact stream that will be downloaded**, and pick tracks before downloading
+- **Honest quality badges**: every track shows the *actual* quality of its source
+  - 🟢 lossless / original file (`FLAC 24-bit`, `WAV Original`)
+  - 🟡 compressed but good (`AAC 160k`, `Opus 129k`, `MP3 320k`)
+  - 🔴 low or unknown
+- **No automatic conversion**: the default *Original* mode keeps the best stream the source offers. If you convert a compressed source to FLAC/WAV, Sonora warns you that it **won't sound better**, and the badge still says `from AAC 160k`
+- Prefers the artist's original file when downloads are enabled on SoundCloud
+- Spotify: reads metadata and cover art from Spotify, finds the matching track on YouTube Music, and warns when the durations differ (it may be a different version)
+- Local library (SQLite): All music, Favorites, Recently added, Playlists, Local folders, search, filter by quality
+- Player: queue, shuffle, repeat, keyboard shortcuts, OS media keys
+- Drag and drop files or folders: copied as-is, never converted
+- Downloads can be cancelled at any time; existing files are never overwritten
+- Update the download engine (yt-dlp) from inside the app, without reinstalling
 
-Vào [Releases](../../releases/latest):
+## Download
 
-| Hệ điều hành | File |
+Get the latest build from [Releases](../../releases/latest):
+
+| OS | File |
 |---|---|
 | macOS Apple Silicon (M1–M4) | `Sonora-macOS-arm64.zip` |
 | macOS Intel | `Sonora-macOS-x64.zip` |
 | Windows 10/11 | `Sonora-Windows-x64.zip` |
 
-App **chưa được ký số** nên lần đầu mở sẽ bị cảnh báo:
+The app is **not code-signed yet**, so your OS will warn you the first time you open it:
 
-- **macOS:** giải nén, kéo `Sonora.app` vào Applications, mở → bị chặn → **System Settings → Privacy & Security → Open Anyway**.
-  Hoặc chạy: `xattr -dr com.apple.quarantine /Applications/Sonora.app`
-- **Windows:** giải nén, chạy `Sonora.exe` → SmartScreen → **More info → Run anyway**. Cần WebView2 (có sẵn trên Windows 10/11).
+- **macOS:** unzip, drag `Sonora.app` into Applications, open it → when it's blocked, go to **System Settings → Privacy & Security → Open Anyway**.
+  Or run: `xattr -dr com.apple.quarantine /Applications/Sonora.app`
+- **Windows:** unzip and run `Sonora.exe` → SmartScreen → **More info → Run anyway**. Requires WebView2 (preinstalled on Windows 10/11).
 
-Thư viện mặc định: `~/Music/Sonora` (đổi trong Settings). Dữ liệu app: `~/.sonora/`.
+Default library folder: `~/Music/Sonora` (change it in Settings). App data: `~/.sonora/`.
 
-## Chạy từ source
+## Run from source
 
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-.venv/bin/python app.py            # mở trong trình duyệt: http://127.0.0.1:5050
+.venv/bin/python app.py            # opens in your browser at http://127.0.0.1:5050
 ```
 
-Cửa sổ native: `pip install pywebview` rồi `python desktop.py`.
-Hoặc double-click `start-mac.command` / `start-windows.bat`.
+For a native window: `pip install pywebview`, then `python desktop.py`.
+Or double-click `start-mac.command` / `start-windows.bat`.
 
 ## Build
 
@@ -57,17 +59,17 @@ python packaging/build.py          # -> dist/Sonora-<os>-<arch>.zip
 python packaging/smoke_test.py
 ```
 
-Push tag `vX.Y.Z` (khớp `VERSION` trong `app.py`) → GitHub Actions build macOS arm64/x64 + Windows x64 và tạo Release.
+Pushing a `vX.Y.Z` tag (it must match `VERSION` in `app.py`) makes GitHub Actions build macOS arm64/x64 and Windows x64, run a smoke test, and publish a Release.
 
-## ⚠️ Sử dụng hợp pháp
+## ⚠️ Legal use
 
-Sonora là trình phát nhạc. Tính năng import từ link **chỉ dành cho nội dung bạn sở hữu hoặc được phép tải**: nhạc của chính bạn, nhạc Creative Commons, hoặc bài nghệ sĩ bật tải.
-Tải nhạc có bản quyền khi chưa được phép có thể vi phạm luật bản quyền nơi bạn sống và điều khoản sử dụng của SoundCloud, YouTube, Spotify. Bạn tự chịu trách nhiệm về cách mình sử dụng phần mềm.
+Sonora is a music player. The import-from-link feature is **only for content you own or have permission to download**: your own music, Creative Commons music, or tracks whose artists have enabled downloads.
+Downloading copyrighted music without permission may violate copyright law where you live and the terms of service of SoundCloud, YouTube and Spotify. You are responsible for how you use this software.
 
-Sonora **không phá DRM**: với link Spotify, app chỉ đọc metadata công khai từ Spotify và tìm bản tương ứng trên YouTube Music.
-Sonora không liên kết với, không được tài trợ hay xác nhận bởi SoundCloud, Spotify, YouTube hay Google.
+Sonora **does not circumvent DRM**: for Spotify links, it only reads public metadata from Spotify and looks up the matching track on YouTube Music.
+Sonora is not affiliated with, sponsored by, or endorsed by SoundCloud, Spotify, YouTube or Google.
 
 ## License
 
-[GPL-3.0-or-later](LICENSE). Thành phần bên thứ ba: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-Built on [yt-dlp](https://github.com/yt-dlp/yt-dlp), [spotDL](https://github.com/spotDL/spotify-downloader), [mutagen](https://github.com/quodlibet/mutagen), [FFmpeg](https://ffmpeg.org), [Flask](https://flask.palletsprojects.com), [pywebview](https://pywebview.flowrl.com).
+[GPL-3.0-or-later](LICENSE). Third-party components: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Built on [yt-dlp](https://github.com/yt-dlp/yt-dlp), [spotDL](https://github.com/spotDL/spotify-downloader), [mutagen](https://github.com/quodlibet/mutagen), [FFmpeg](https://ffmpeg.org), [Flask](https://flask.palletsprojects.com) and [pywebview](https://pywebview.flowrl.com).
