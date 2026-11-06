@@ -1,0 +1,6 @@
+flask>=3.0
+yt-dlp>=2026.10.26
+spotdl>=4.6.0
+rich>=13.9.4,<14
+static-ffmpeg>=2.13
+mutagen>=1.47

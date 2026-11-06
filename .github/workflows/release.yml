@@ -1,0 +1,73 @@
+name: Build & release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15         # Apple Silicon
+          - os: macos-15-intel   # Intel Mac
+          - os: windows-latest   # Windows x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check tag matches app version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          v=$(python -c "import re;print(re.search(r'VERSION = \"([^\"]+)\"', open('app.py', encoding='utf-8').read()).group(1))")
+          [ "v$v" = "${GITHUB_REF_NAME}" ] || { echo "Tag ${GITHUB_REF_NAME} != app VERSION $v"; exit 1; }
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r packaging/requirements-build.txt
+
+      - name: Build
+        run: python packaging/build.py
+
+      - name: Smoke test
+        run: python packaging/smoke_test.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sonora-${{ matrix.os }}
+          path: dist/Sonora-*.zip
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
+          body: |
+            **Cài đặt**
+            - macOS Apple Silicon: `Sonora-macOS-arm64.zip` · Intel: `Sonora-macOS-x64.zip`
+            - Windows 10/11: `Sonora-Windows-x64.zip` → giải nén → chạy `Sonora.exe`
+
+            App chưa được ký số (code signing). macOS: mở lần đầu bằng System Settings → Privacy & Security → **Open Anyway**.
+            Windows SmartScreen: **More info → Run anyway**.
+
+            Chỉ import nội dung bạn sở hữu hoặc được phép tải.

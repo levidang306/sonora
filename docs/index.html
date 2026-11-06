@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sonora — Local-first music player</title>
+<meta name="description" content="Sonora: trình phát nhạc local-first. Import từ file hoặc link, giữ nguyên chất lượng nguồn, quản lý thư viện ngay trên máy bạn. Miễn phí, mã nguồn mở (GPL-3.0)." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='13' cy='16' r='10' fill='%23a9cf38'/%3E%3Ccircle cx='11' cy='16' r='10' fill='%23d8ff46'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#0d0f12;--panel:#15181d;--panel2:#1b1f26;--line:#2a2f38;--muted:#8f98a6;--text:#f4f6f8;--accent:#d8ff46;--accent2:#a9cf38;--green-bg:#253b29;--green:#acdf9b;--yellow-bg:#473b1e;--yellow:#f2c56d;--red-bg:#4a2526;--red:#ff9d97}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 80% 0,#252039 0,transparent 38%),var(--bg);color:var(--text);font:16px/1.6 Inter,Geist,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
+.brand{font-size:21px;font-weight:800;letter-spacing:-.05em;display:flex;gap:9px;align-items:center;text-decoration:none}
+.brand i{width:20px;height:20px;border-radius:50%;background:var(--accent);display:block;box-shadow:7px 0 0 var(--accent2)}
+nav .links{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+nav .links a{text-decoration:none}nav .links a:hover{color:var(--text)}
+.hero{padding:64px 0 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
+.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.16em;text-transform:uppercase}
+h1{font-size:clamp(42px,7vw,76px);letter-spacing:-.06em;line-height:1;margin:12px 0 18px}
+.lead{color:var(--muted);font-size:18px;max-width:620px;margin:0}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
+.btn{background:var(--accent);color:#111;border:0;border-radius:10px;padding:13px 18px;font-weight:700;text-decoration:none;display:inline-flex;gap:8px;align-items:center;font-size:15px}
+.btn small{font-weight:500;opacity:.7}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text);font-weight:500}
+.btn.ghost:hover{border-color:#4b535e}
+.note{color:var(--muted);font-size:13px;margin-top:14px}
+.mock{margin:30px 0 10px;border:1px solid var(--line);border-radius:18px;background:#101216;overflow:hidden;display:grid;grid-template-columns:180px minmax(0,1fr) 230px;min-height:400px}
+.mock .side{border-right:1px solid var(--line);padding:20px 14px;font-size:13px;color:var(--muted)}
+.mock .side b{display:block;color:var(--text);margin-bottom:22px}
+.mock .side div{padding:7px 10px;border-radius:8px}
+.mock .side .on{background:var(--panel2);color:var(--text);box-shadow:inset 3px 0 var(--accent)}
+.mock .mid{padding:22px}
+.mock .mid h3{margin:0 0 4px;font-size:22px;letter-spacing:-.04em}
+.mock .row{display:grid;grid-template-columns:34px minmax(0,1fr) auto 44px;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.mock .row:last-child{border:0}
+.mock .tbl{border:1px solid var(--line);border-radius:12px;margin-top:16px;background:#12151a}
+.th{width:34px;height:34px;border-radius:6px}
+.row small{display:block;color:var(--muted);font-size:11.5px}
+.dur{color:var(--muted);font-size:12px;text-align:right}
+.tag{font-size:11px;padding:3px 8px;border-radius:20px;white-space:nowrap;font-weight:600}
+.lossless{background:var(--green-bg);color:var(--green)}.good{background:var(--yellow-bg);color:var(--yellow)}.low{background:var(--red-bg);color:var(--red)}
+.mock .right{border-left:1px solid var(--line);padding:20px}
+.cov{aspect-ratio:1;border-radius:12px;background:linear-gradient(145deg,#50406c,#171825 60%)}
+.mock .right b{display:block;margin-top:14px}.mock .right small{color:var(--muted)}
+.bar{height:4px;background:#313742;border-radius:3px;margin:16px 0}.bar i{display:block;width:38%;height:100%;background:var(--accent);border-radius:3px}
+.warn{display:flex;gap:10px;padding:10px 12px;border-radius:10px;margin-top:14px;font-size:12.5px;background:#2a2414;border:1px solid #4d4020;color:#f2d79a;line-height:1.5}
+section{padding:60px 0;border-top:1px solid var(--line)}
+h2{font-size:clamp(28px,4vw,40px);letter-spacing:-.045em;margin:0 0 10px;line-height:1.1}
+.sub{color:var(--muted);max-width:640px;margin:0 0 30px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.card{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:20px}
+.card b{display:block;margin-bottom:6px}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.badges{display:flex;flex-direction:column;gap:12px}
+.badges div{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--panel)}
+.badges .tag{min-width:120px;text-align:center;font-size:12px;padding:5px 10px}
+.badges p{margin:0;color:var(--muted);font-size:14px}
+.dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.dl a{text-decoration:none;border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--panel);display:block}
+.dl a:hover{border-color:var(--accent)}
+.dl b{display:block;font-size:17px}.dl small{color:var(--muted)}
+.dl span{display:inline-block;margin-top:14px;color:var(--accent);font-weight:600;font-size:14px}
+.steps{color:var(--muted);font-size:14px;line-height:1.7;margin-top:24px}
+.steps code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:12.5px;color:var(--text)}
+.legal{border:1px solid #4d4020;background:#1d1a10;border-radius:14px;padding:22px 24px;color:#e9d8a8;font-size:14.5px}
+.legal b{color:var(--text)}
+footer{padding:40px 0 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+@media(max-width:860px){.mock{grid-template-columns:minmax(0,1fr)}.mock .side,.mock .right{display:none}nav .links{display:none}}
+@media(max-width:520px){.mock .row{grid-template-columns:30px minmax(0,1fr) auto}.mock .dur{display:none}.lead{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav><a class="brand" href="#"><i></i>sonora</a>
+    <div class="links"><a href="#features">Features</a><a href="#quality">Quality</a><a href="#download">Download</a><a class="repo" href="#">GitHub</a></div></nav>
+
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Your private music shelf</div>
+      <h1>Bring your sound<br>home.</h1>
+      <p class="lead">Trình phát nhạc local-first. Nhập nhạc từ file, folder hoặc link, giữ nguyên chất lượng nguồn và quản lý cả thư viện ngay trên máy bạn — không tài khoản, không server.</p>
+      <div class="cta">
+        <a class="btn" id="primaryDl" href="#download">Download <small id="primaryOs">free</small></a>
+        <a class="btn ghost repo" href="#">View source on GitHub</a>
+      </div>
+      <p class="note">macOS (Apple Silicon &amp; Intel) · Windows 10/11 · Free &amp; open source (GPL-3.0)</p>
+    </div>
+
+    <div class="mock" aria-label="Sonora app preview">
+      <div class="side"><b>sonora</b><div class="on">All music</div><div>Favorites</div><div>Recently added</div><div>Playlists</div><div>Local folders</div><div>Downloads</div></div>
+      <div class="mid">
+        <h3>Import preview</h3><small style="color:var(--muted)">Field recordings · 4 tracks · source checked</small>
+        <div class="warn">⚠ 2 bài có nguồn nén (AAC 160k). Đổi sang FLAC không làm hay hơn — chỉ làm file to hơn. Chọn Original để giữ nguyên.</div>
+        <div class="tbl">
+          <div class="row"><div class="th" style="background:#3c5a4a"></div><div>Morning Tide<small>Your own upload</small></div><span class="tag lossless">WAV Original</span><span class="dur">3:41</span></div>
+          <div class="row"><div class="th" style="background:#5a4a3c"></div><div>Night Drive<small>CC BY 4.0</small></div><span class="tag lossless">FLAC 24-bit</span><span class="dur">4:03</span></div>
+          <div class="row"><div class="th" style="background:#3c4a5a"></div><div>Rooftops<small>Free download</small></div><span class="tag good">AAC 160k</span><span class="dur">2:58</span></div>
+          <div class="row"><div class="th" style="background:#4a3c5a"></div><div>Static Bloom<small>Demo</small></div><span class="tag low">AAC 96k</span><span class="dur">3:12</span></div>
+        </div>
+      </div>
+      <div class="right"><div class="cov"></div><b>Night Drive</b><small>FLAC · 48 kHz · 24-bit</small><div class="bar"><i></i></div><small>Up next · 3 tracks</small></div>
+    </div>
+  </header>
+
+  <section id="features">
+    <h2>Nghe trước, tải sau.<br>Không đoán mò chất lượng.</h2>
+    <p class="sub">Mọi thứ Sonora làm đều hiện rõ: nguồn là gì, chất lượng thật bao nhiêu, file nằm ở đâu.</p>
+    <div class="grid">
+      <div class="card"><b>Import preview</b><p>Dán link, xem danh sách bài, nghe thử đúng luồng sẽ tải về, chọn bài trước khi tải.</p></div>
+      <div class="card"><b>Không tự convert</b><p>Mặc định giữ nguyên luồng tốt nhất của nguồn. Chỉ convert khi bạn chọn — kèm cảnh báo nếu vô ích.</p></div>
+      <div class="card"><b>File gốc khi có thể</b><p>Tự lấy file gốc nghệ sĩ cho tải thay vì bản stream nén.</p></div>
+      <div class="card"><b>Thư viện local</b><p>Favorites, playlists, folders, tìm kiếm, lọc theo chất lượng. Kéo thả file/folder để thêm.</p></div>
+      <div class="card"><b>Biết file ở đâu</b><p>Mỗi bài hiện đường dẫn thật, mở trong Finder/Explorer một cú bấm.</p></div>
+      <div class="card"><b>Huỷ an toàn</b><p>Huỷ bất kỳ lúc nào. Sonora không bao giờ ghi đè file bạn đã có.</p></div>
+    </div>
+  </section>
+
+  <section id="quality">
+    <h2>Badge nói thật.</h2>
+    <p class="sub">Badge hiển thị chất lượng thực tế của nguồn — kể cả khi bạn đã convert. Một file FLAC tạo từ AAC 160k vẫn ghi “from AAC 160k”.</p>
+    <div class="badges">
+      <div><span class="tag lossless">FLAC 24-bit</span><p>Lossless hoặc file gốc — không mất dữ liệu.</p></div>
+      <div><span class="tag good">AAC 256k</span><p>Nén có mất dữ liệu nhưng chất lượng nghe tốt.</p></div>
+      <div><span class="tag low">AAC 96k</span><p>Nén mạnh hoặc không xác định được nguồn.</p></div>
+    </div>
+  </section>
+
+  <section id="download">
+    <h2>Download</h2>
+    <p class="sub">Miễn phí, mã nguồn mở. Chọn bản cho máy của bạn.</p>
+    <div class="dl">
+      <a data-file="Sonora-macOS-arm64.zip" href="#"><b>macOS · Apple Silicon</b><small>M1, M2, M3, M4</small><br><span>Download .zip →</span></a>
+      <a data-file="Sonora-macOS-x64.zip" href="#"><b>macOS · Intel</b><small>Mac đời Intel</small><br><span>Download .zip →</span></a>
+      <a data-file="Sonora-Windows-x64.zip" href="#"><b>Windows</b><small>Windows 10 / 11 · x64</small><br><span>Download .zip →</span></a>
+    </div>
+    <div class="steps">
+      App chưa được ký số nên hệ điều hành sẽ cảnh báo ở lần mở đầu tiên.<br>
+      <b style="color:var(--text)">macOS:</b> giải nén, kéo vào Applications, mở → System Settings → Privacy &amp; Security → <b style="color:var(--text)">Open Anyway</b>.<br>
+      <b style="color:var(--text)">Windows:</b> giải nén, chạy <code>Sonora.exe</code> → SmartScreen → <b style="color:var(--text)">More info → Run anyway</b>.<br>
+      Tất cả phiên bản: <a class="releases" href="#">GitHub Releases</a>
+    </div>
+  </section>
+
+  <section>
+    <div class="legal"><b>Sử dụng hợp pháp.</b> Tính năng import từ link chỉ dành cho nội dung bạn sở hữu hoặc được phép tải — nhạc của chính bạn, nhạc Creative Commons, hoặc bài nghệ sĩ bật tải. Tải nhạc có bản quyền khi chưa được phép có thể vi phạm luật bản quyền và điều khoản của các dịch vụ. Sonora không phá DRM và không liên kết với SoundCloud, Spotify, YouTube hay Google.</div>
+  </section>
+
+  <footer><span>Sonora · GPL-3.0-or-later</span><span><a class="repo" href="#">Source</a> · <a class="releases" href="#">Releases</a> · <a class="notices" href="#">Third-party notices</a></span></footer>
+</div>
+<script>
+const REPO = "levidang306/sonora";
+const gh = `https://github.com/${REPO}`;
+document.querySelectorAll(".repo").forEach((a) => (a.href = gh));
+document.querySelectorAll(".releases").forEach((a) => (a.href = gh + "/releases/latest"));
+document.querySelectorAll(".notices").forEach((a) => (a.href = gh + "/blob/main/THIRD_PARTY_NOTICES.md"));
+document.querySelectorAll("[data-file]").forEach((a) => (a.href = `${gh}/releases/latest/download/${a.dataset.file}`));
+const ua = navigator.userAgent;
+const pick = /Windows/.test(ua) ? ["Sonora-Windows-x64.zip", "for Windows"] : /Mac/.test(ua) ? ["Sonora-macOS-arm64.zip", "for macOS"] : null;
+if (pick) { document.getElementById("primaryDl").href = `${gh}/releases/latest/download/${pick[0]}`; document.getElementById("primaryOs").textContent = pick[1]; }
+</script>
+</body>
+</html>
