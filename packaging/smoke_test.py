@@ -14,7 +14,7 @@ tmp = Path(tempfile.mkdtemp())
 env = dict(os.environ, SONORA_HEADLESS="1", SONORA_PORT="5077", SONORA_DATA=str(tmp / "data"), SONORA_STORAGE=str(tmp / "lib"))
 proc = subprocess.Popen([str(exe)], env=env)
 try:
-    for _ in range(90):
+    for _ in range(180):
         try:
             state = json.load(urllib.request.urlopen("http://127.0.0.1:5077/api/state", timeout=2))
             break

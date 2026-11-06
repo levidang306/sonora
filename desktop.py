@@ -16,14 +16,17 @@ def free_port() -> int:
         return s.getsockname()[1]
 
 
-def wait_ready(url: str, timeout: float = 30) -> bool:
+def wait_ready(url: str, timeout: float = 120) -> bool:
     end = time.time() + timeout
+    last = None
     while time.time() < end:
         try:
             urllib.request.urlopen(url + "/api/state", timeout=2)
             return True
-        except Exception:
-            time.sleep(0.15)
+        except Exception as e:  # noqa: BLE001
+            last = e
+            time.sleep(0.25)
+    print(f"Sonora: server not ready after {timeout}s: {last!r}", file=sys.stderr)
     return False
 
 

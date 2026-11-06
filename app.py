@@ -41,7 +41,7 @@ import mutagen
 import yt_dlp
 from flask import Flask, Response, abort, jsonify, request, send_file, send_from_directory
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 REPO = os.environ.get("SONORA_REPO", "levidang306/sonora")
 FROZEN = getattr(sys, "frozen", False)
 BASE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
